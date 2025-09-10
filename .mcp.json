@@ -1,0 +1,10 @@
+{
+  "mcpServers": {
+    "mcp-nettools": {
+      "type": "stdio",
+      "command": "./bin/mcp-nettools",
+      "args": [],
+      "env": {}
+    }
+  }
+}

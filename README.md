@@ -11,6 +11,76 @@ A simple MCP (Model Context Protocol) server that provides network proxy debuggi
 - **Non-blocking** - All operations return immediately
 - **Thread-safe** - Supports multiple concurrent connections
 
+## Usage
+
+You can have Claude Code watch traffic between two services by starting a proxy.
+
+```bash
+claude mcp add -s project mcp-nettools ./bin/mcp-nettools
+```
+
+```bash
+claude
+(approve MCP server)
+```
+
+```text
+> Can you start a python webserver at 8080 and a proxy at 9090 and then await?
+
+⏺ I'll start a Python web server on port 8080 and set up a proxy on port 9090 that forwards to it.
+
+⏺ Bash(python3 -m http.server 8080)
+  ⎿  Running in the background (down arrow to manage)
+
+⏺ mcp-nettools - start_proxy (MCP)(listen_port: 9090, forward_port: 8080)
+       "forward_to": "localhost:8080",
+       "listen_port": 9090,
+     … +2 lines (ctrl+r to expand)
+
+⏺ Both services are now running:
+  - Python web server on port 8080 (background process e922ff)
+  - Proxy on port 9090 forwarding to localhost:8080
+
+  The proxy will capture and display traffic between clients connecting to port 9090 and the Python server on port 8080.
+
+! curl -s http://localhost:9090
+[...]
+
+> Can you get traffic and tell me what you see?
+
+⏺ mcp-nettools - get_proxy_output (MCP)(listen_port: 9090, clear_buffer: false)
+  ⎿ {
+       "proxies": [
+         {
+     … +68 lines (ctrl+r to expand)
+
+⏺ The proxy captured HTTP traffic showing:
+
+  1. Client Request (via curl):
+    - GET request to root path /
+    - User-Agent: curl/8.7.1
+    - Requesting from localhost:9090
+  2. Server Response:
+    - HTTP 200 OK response
+    - Python SimpleHTTP server (version 3.12.8)
+    - Content-Type: text/html
+    - Body contains an HTML directory listing showing folders like .claude/ and .git/
+
+  The proxy successfully intercepted and logged the complete HTTP exchange between the client and the Python web server, showing both the request headers and the HTML response body
+  with a directory listing.
+
+> Go ahead and stop the proxy
+
+⏺ mcp-nettools - stop_proxy (MCP)(listen_port: 9090)
+  ⎿
+       "bytes_captured": 846,
+       "listen_port": 9090,
+     … +2 lines (ctrl+r to expand)
+
+⏺ Proxy on port 9090 has been stopped. It captured 846 bytes of traffic during its operation.
+```
+
+
 ## Installation
 
 ### Build from source
